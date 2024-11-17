@@ -36,46 +36,48 @@ class _InputTypesViewState extends State<InputTypesView> {
       child: Scaffold(
         appBar: const AppbarCommon(title: "Input Types"),
         body: Consumer<InputTypeController>(
-            builder: (context, controller, child) {
-          if (controller.typeUiList.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return ListView.builder(
-              itemCount: controller.typeUiList.length,
-              shrinkWrap: true,
-              primary: false,
-              itemBuilder: (context, index) {
-                final data = controller.typeUiList[index];
-                return Column(
-                  children: [
-                    _buildAllSection(context, data),
-                    _divider(),
-                  ],
-                );
-              },
-            );
-          }
-        }),
+          builder: (context, controller, child) {
+            if (controller.typeUiList.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return ListView.builder(
+                itemCount: controller.typeUiList.length,
+                shrinkWrap: true,
+                primary: false,
+                itemBuilder: (context, index) {
+                  final data = controller.typeUiList[index];
+                  return Column(
+                    children: [
+                      _buildAllSection(context, index, data),
+                      _divider(),
+                    ],
+                  );
+                },
+              );
+            }
+          },
+        ),
         bottomNavigationBar: _buildSubmitButton(context),
       ),
     );
   }
 
-  Widget _buildAllSection(BuildContext context, TypesUiModel data) {
+  Widget _buildAllSection(BuildContext context, int index, TypesUiModel data) {
     if ('${data.type}' == 'radio') {
-      return _buildRadioSection(context, data);
+      return _buildRadioSection(context, index, data);
     } else if ('${data.type}' == 'dropdown') {
-      return _buildDropDownSection(context, data);
+      return _buildDropDownSection(context, index, data);
     } else if ('${data.type}' == 'checkbox') {
-      return _buildCheckBoxSection(context, data);
+      return _buildCheckBoxSection(context, index, data);
     } else if ('${data.type}' == 'textfield') {
-      return _buildTextFildSection(context, data);
+      return _buildTextFildSection(context, index, data);
     } else {
       return SizedBox.fromSize();
     }
   }
 
-  Widget _buildRadioSection(BuildContext context, TypesUiModel data) {
+  Widget _buildRadioSection(
+      BuildContext context, int index, TypesUiModel data) {
     return Padding(
       padding: screenPaddingH(context),
       child: Column(
@@ -94,8 +96,7 @@ class _InputTypesViewState extends State<InputTypesView> {
                   values: data.options,
                   groupValue: data.selectedValue.toString(),
                   onChanged: (value) {
-                    data.selectedValue = value;
-                    setState(() {});
+                    controller.radioValueChange(index, data, value);
                   },
                 ),
               ],
@@ -107,7 +108,8 @@ class _InputTypesViewState extends State<InputTypesView> {
     );
   }
 
-  Widget _buildDropDownSection(BuildContext context, TypesUiModel data) {
+  Widget _buildDropDownSection(
+      BuildContext context, int index, TypesUiModel data) {
     return Padding(
       padding: screenPaddingH(context),
       child: Column(
@@ -125,8 +127,7 @@ class _InputTypesViewState extends State<InputTypesView> {
                   List.generate(data.options.length, (index) => index),
               label: "BedRooms",
               onChanged: (p0) {
-                data.selectedValue = p0.toString();
-                setState(() {});
+                controller.dropDownValueChange(data, p0.toString());
               },
             );
           }),
@@ -136,7 +137,8 @@ class _InputTypesViewState extends State<InputTypesView> {
     );
   }
 
-  Widget _buildCheckBoxSection(BuildContext context, TypesUiModel data) {
+  Widget _buildCheckBoxSection(
+      BuildContext context, int index, TypesUiModel data) {
     return Padding(
       padding: screenPaddingH(context),
       child: Column(
@@ -156,17 +158,8 @@ class _InputTypesViewState extends State<InputTypesView> {
                           isChecked:
                               data.selectedValue?.contains(option) ?? false,
                           onChanged: (isChecked) {
-                            if (isChecked ?? false) {
-                              if (data.selectedValue == null) {
-                                data.selectedValue = option;
-                              } else if (!data.selectedValue!
-                                  .contains(option)) {
-                                data.selectedValue = option;
-                              }
-                            } else {
-                              data.selectedValue = null;
-                            }
-                            setState(() {});
+                            controller.checkboxValueChange(
+                                data, isChecked, option);
                           },
                           text: option);
                     }).toList() ??
@@ -180,7 +173,8 @@ class _InputTypesViewState extends State<InputTypesView> {
     );
   }
 
-  Widget _buildTextFildSection(BuildContext context, TypesUiModel data) {
+  Widget _buildTextFildSection(
+      BuildContext context, int index, TypesUiModel data) {
     // final controller = Provider.of<InputTypeController>(context).textController;
     TextEditingController controller =
         TextEditingController(text: data.selectedValue);

@@ -11,6 +11,33 @@ class InputTypeController with ChangeNotifier {
   final List<TypesUiModel> _typeUiList = [];
   List<TypesUiModel> get typeUiList => _typeUiList;
 
+  radioValueChange(int index, TypesUiModel data, String value) {
+    data.selectedValue = value;
+    notifyListeners();
+  }
+
+  dropDownValueChange(TypesUiModel data, String value) {
+    if (value == "0") {
+      data.selectedValue = null;
+    } else {
+      data.selectedValue = value.toString();
+    }
+    notifyListeners();
+  }
+
+  checkboxValueChange(TypesUiModel data, bool? isChecked, String option) {
+    if (isChecked ?? false) {
+      if (data.selectedValue == null) {
+        data.selectedValue = option;
+      } else if (!data.selectedValue!.contains(option)) {
+        data.selectedValue = option;
+      }
+    } else {
+      data.selectedValue = null;
+    }
+    notifyListeners();
+  }
+
   submitButton(
       BuildContext context, List<TypesUiModel> _list, int selectedInputCount) {
     AppRoutes.goSelectedInputView(context, _list, selectedInputCount);
