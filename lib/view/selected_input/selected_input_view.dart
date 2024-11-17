@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:project/model/selected_input_model.dart';
+import 'package:project/model/types_ui_model.dart';
 import 'package:project/res/app_routes/app_routes.dart';
 import 'package:project/res/app_text_style/app_text_style.dart';
 import 'package:project/res/color_manager/app_colors.dart';
@@ -8,14 +8,18 @@ import 'package:project/utils/ui_constant.dart';
 import 'package:project/view/common/appbar_common.dart';
 
 class SelectedInputView extends StatelessWidget {
-  final List<SelectedInputModel> inputModelList;
+  final List<TypesUiModel> inputModelList;
+  final int selectedInputCount;
 
-  const SelectedInputView({super.key, required this.inputModelList});
+  const SelectedInputView(
+      {super.key,
+      required this.inputModelList,
+      required this.selectedInputCount});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppbarCommon(title: ''),
+      appBar: const AppbarCommon(title: ""),
       body: SafeArea(
           child: Padding(
         padding: screenPaddingH(context),
@@ -29,7 +33,7 @@ class SelectedInputView extends StatelessWidget {
                   style: AppTextStyle.tittleBig3(),
                 ),
                 Text(
-                  '${inputModelList.length} items',
+                  '$selectedInputCount items',
                   style: AppTextStyle.tittleBig4(),
                 ),
               ],
@@ -49,27 +53,31 @@ class SelectedInputView extends StatelessWidget {
                     itemCount: inputModelList.length,
                     itemBuilder: (context, index) {
                       final data = inputModelList[index];
-                      return Padding(
-                        padding: edgeInsetsSym(context, 0, 1),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.select_all,
-                              color: AppColors.primaryColor,
-                            ),
-                            gapW(context, 2),
-                            RichText(
-                                text: TextSpan(children: [
-                              TextSpan(
-                                  text: data.title + ": ",
-                                  style: AppTextStyle.tittleSmall2()),
-                              TextSpan(
-                                  text: data.selectedValue,
-                                  style: AppTextStyle.paragraph2())
-                            ]))
-                          ],
-                        ),
-                      );
+                      if (data.selectedValue != null) {
+                        return Padding(
+                          padding: edgeInsetsSym(context, 0, 1),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.select_all,
+                                color: AppColors.primaryColor,
+                              ),
+                              gapW(context, 2),
+                              RichText(
+                                  text: TextSpan(children: [
+                                TextSpan(
+                                    text: data.title.toString() + ": ",
+                                    style: AppTextStyle.tittleSmall2()),
+                                TextSpan(
+                                    text: data.selectedValue,
+                                    style: AppTextStyle.paragraph2())
+                              ]))
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
                     },
                   ),
                   gapH(context, 2),

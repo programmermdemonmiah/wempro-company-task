@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project/model/selected_input_model.dart';
+import 'package:project/model/types_ui_model.dart';
 import 'package:project/res/app_routes/app_routes_name.dart';
 import 'package:project/view/home/home_view.dart';
 import 'package:project/view/input_types/input_types_view.dart';
@@ -13,24 +13,32 @@ class AppRoutes {
     AppRoutesName.inputTypesView: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
       if (args != null) {
-        return InputTypesView(inputModelList: args as List<SelectedInputModel>);
+        return InputTypesView(inputModelList: args as List<TypesUiModel>);
       } else {
         return const InputTypesView();
       }
     },
-    AppRoutesName.selectedInputView: (context) => SelectedInputView(
-          inputModelList: ModalRoute.of(context)!.settings.arguments
-              as List<SelectedInputModel>,
-        ),
+    AppRoutesName.selectedInputView: (context) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      final dataList = args['dataList'] as List<TypesUiModel>;
+      final selectedInputCount = args['selectedInputCount'] as int;
+
+      return SelectedInputView(
+        inputModelList: dataList,
+        selectedInputCount: selectedInputCount,
+      );
+    },
   };
 
-  static goInputTypeView(BuildContext context,
-          {List<SelectedInputModel>? data}) =>
+  static goInputTypeView(BuildContext context, {List<TypesUiModel>? data}) =>
       Navigator.pushNamed(context, AppRoutesName.inputTypesView,
           arguments: data ?? null);
 
-  static goSelectedInputView(
-          BuildContext context, List<SelectedInputModel> data) =>
-      Navigator.pushNamed(context, AppRoutesName.selectedInputView,
-          arguments: data);
+  static goSelectedInputView(BuildContext context, List<TypesUiModel> data,
+          int selectedInputCount) =>
+      Navigator.pushNamed(context, AppRoutesName.selectedInputView, arguments: {
+        "dataList": data,
+        "selectedInputCount": selectedInputCount
+      });
 }
